@@ -45,7 +45,7 @@ Welcome to the cutting edge (or at least, the slightly less dull edge) of local 
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/paul0pv/flaskHS.git](https://github.com/paul0pv/flaskHS.git)
+    git clone https://github.com/paul0pv/flaskHS.git
     cd flaskHS
     ```
 

@@ -1,0 +1,175 @@
+import subprocess
+import requests
+from flask import Flask,request, render_template, request, jsonify, url_for
+
+#styles = url_for('static', filename='styles.css')
+#script = url_for('static', filename='index.js')
+
+app = Flask(__name__)
+
+PI_PICO_BASE_URL = "http://192.168.1.100"
+led_state = {"ledRed": 0, "ledGreen": 0}
+
+@app.route('/')
+def index():
+    #styles = url_for('static', filename='styles.css')
+    #script = url_for('static', filename='index.js')
+
+    # MyOut = subprocess.call(f'''termux-tts-speak {text}''', shell=True)
+    return '''
+        <!DOCTYPE html>                                       
+        <html>
+        <head>
+        <title>Led controller</title>
+        <!--link rel="stylesheet" type="text/css" href="{{styles}}"-->
+        <style>
+        body {
+            background-color: #223843;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            background-color: #D8B4A0;
+            color: #EFF1f3;
+        }
+        header {
+            display: flex;
+            width: 100%;
+            height: 1.5rem;
+            margin-bottom: 0.75rem;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        h1 {
+            margin: auto;
+            font-size: 1rem;
+            color: #DBD3D8;
+        }
+        .container {
+            width: 80vw;
+            margin: auto;
+            padding: 2rem;
+            overflow: hidden;
+            display: grid;
+            align-items:center;
+            background-color: #D77A61;
+            border-radius: 0.25rem;
+        }
+        .container > div {
+            display: grid;
+        }
+        p {
+            color: #EFF1F3;
+        }
+
+        @media (min-width: 1080px) {
+            h1 {
+            font-size: 2rem;
+        }
+        .container > div {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-evenly;
+        }
+            button:hover {
+                border: 0.5px;
+                border-color: #EFF1F3;
+            }
+        }
+        </style>
+         <script>
+    async function sendCommand(red, green) {
+      const resp = await fetch("/control-led", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ledRed: red, ledGreen: green})
+      });
+      const data = await resp.json();
+      document.getElementById("status").innerText = data.message || data.error;
+    }
+        function toggle(id) {
+      const redBtn = document.getElementById("Red");
+      const greenBtn = document.getElementById("Green");
+
+      if (id === "Red") {
+        redBtn.dataset.state = redBtn.dataset.state === "1" ? "0" : "1";
+      } else {
+        greenBtn.dataset.state = greenBtn.dataset.state === "1" ? "0" : "1";
+      }
+
+      const newRed = parseInt(redBtn.dataset.state);
+      const newGreen = parseInt(greenBtn.dataset.state);
+
+      redBtn.innerText = `Red = ${newRed}`;
+      greenBtn.innerText = `Green = ${newGreen}`;
+
+      sendCommand(newRed, newGreen);
+    }
+
+    async function syncLedState() {
+      const resp = await fetch("/get-led-state");
+      const data = await resp.json();
+      const red = data.ledRed;
+      const green = data.ledGreen;
+
+      const redBtn = document.getElementById("Red");
+      const greenBtn = document.getElementById("Green");
+
+      if (parseInt(redBtn.dataset.state) !== red) {
+        redBtn.dataset.state = red;
+        redBtn.innerText = `Red = ${red}`;
+      }
+
+      if (parseInt(greenBtn.dataset.state) !== green) {
+        greenBtn.dataset.state = green;
+        greenBtn.innerText = `Green = ${green}`;
+      }
+    }
+
+    setInterval(syncLedState, 2000);
+    </script> 
+        </head>
+        <body>
+        <header>
+        <h1>Pico LED Control</h1>
+        </header>
+        <main>
+        <div class='container'>
+        <div class='buttons_section'>
+        <button id="Red" data-state="0" onclick="toggle('Red')">Red = 0</button>
+        <button id="Green" data-state="0" onclick="toggle('Green')">Green = 0</button>
+        </div>
+        <p id="status"></p>
+        </div>
+        </main>
+        </body>
+        </html>'''
+
+@app.route("/get-led-state", methods=["GET"])
+def get_led_state():
+    return jsonify(led_state)
+
+@app.route('/control-led',methods=["POST"])
+def control_led():
+    global led_state
+
+    ledRed = int(request.json.get("ledRed", 0))
+    ledGreen = int(request.json.get("ledGreen", 0))
+    
+    led_state = {"ledRed": ledRed, "ledGreen": ledGreen}
+    
+    try:
+        resp = requests.post(
+            f"{PI_PICO_BASE_URL}/api/control-led",
+            json=led_state,
+            timeout=2
+        )
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify(resp.json()), resp.status_code
+
+if __name__ =='__main__':
+    app.run(host='0.0.0.0', debug=True)
+

@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+webenv/ # Your virtual environment folder
+*.egg-info/
+.pytest_cache/
+.tox/
+.mypy_cache/
+.vscode/ # VS Code specific files
+.idea/ # PyCharm/IntelliJ specific files
+
+# Database
+*.db # SQLite database files, like automation.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Operating System Files
+.DS_Store # macOS
+Thumbs.db # Windows
+desktop.ini # Windows
+
+# MicroPython specific files (if you copy files to ESP32 via project root)
+boot.pyc
+main.pyc
+data.pyc
+devices.pyc
+netutils.pyc
+poc.pyc
+
+# IDE specific files (e.g., Thonny)
+*.mpy
+
+# Image generation (if any)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.svg
+
+# Any sensitive files (add more as needed)
+config.ini
+.env

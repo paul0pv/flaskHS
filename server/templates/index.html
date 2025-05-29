@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Automation Dashboard</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="app-bar">
+      <h1>🏠 Smart Home Dashboard</h1>
+    </header>
+
+    <main class="main-content">
+      <section class="card">
+        <h2>LED Control</h2>
+        <div class="buttons">
+          <button id="redBtn" class="mdc-button mdc-button--raised" onclick="toggle('ledRed')">
+            <span class="mdc-button__label">Red: OFF</span>
+          </button>
+          <button id="greenBtn" class="mdc-button mdc-button--raised" onclick="toggle('ledGreen')">
+            <span class="mdc-button__label">Green: OFF</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Sensor Data</h2>
+        <div id="sensorData" class="sensor-grid">
+          <p class="placeholder-message">No data yet...</p>
+        </div>
+
+        <div class="chart-selection">
+            <h3>Select Sensor Chart:</h3>
+            <select id="sensorChartSelector" onchange="showSelectedChart()">
+                </select>
+        </div>
+
+        <div id="chartContainers" class="chart-containers">
+            <div id="lightSensorAdsChartContainer" class="chart-container" style="display: none;">
+                <h3>Light Sensor (ADS1115) History (Last 10 values)</h3>
+                <canvas id="lightSensorAdsChart"></canvas>
+            </div>
+            <div id="micSensorAdsChartContainer" class="chart-container" style="display: none;">
+                <h3>Mic Sensor (ADS1115) History (Last 10 values)</h3>
+                <canvas id="micSensorAdsChart"></canvas>
+            </div>
+            <div id="lightSensorEsp32ChartContainer" class="chart-container" style="display: none;">
+                <h3>Light Sensor (ESP32 ADC) History (Last 10 values)</h3>
+                <canvas id="lightSensorEsp32Chart"></canvas>
+            </div>
+            <div id="micSensorEsp32ChartContainer" class="chart-container" style="display: none;">
+                <h3>Mic Sensor (ESP32 ADC) History (Last 10 values)</h3>
+                <canvas id="micSensorEsp32Chart"></canvas>
+            </div>
+        </div>
+      </section>
+
+      <section class="card">
+          <h2>Server Messages</h2>
+          <div id="serverMessages" class="server-messages">
+              <p class="placeholder-message">No server messages.</p>
+          </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <small>Made with 💡 using Flask + WebSocket</small>
+    </footer>
+  </div>
+
+  <script>
+    const socket = io();
+    let state = { ledRed: 0, ledGreen: 0 };
+
+    // Historial y objetos Chart para los gráficos
+    const sensorCharts = {}; // Almacenará los objetos Chart.js
+    const sensorHistory = {}; // Almacenará el historial de datos para cada tipo de sensor
+    const MAX_HISTORY_LENGTH = 10; // Mantener solo los últimos 10 valores para los gráficos
+
+    // Mapeo de sensorType a un nombre legible y el ID del contenedor
+    const chartMapping = {
+        'ldr_ads1115_V': { label: 'Light Sensor (ADS1115)', canvasId: 'lightSensorAdsChart', containerId: 'lightSensorAdsChartContainer', borderColor: 'rgb(75, 192, 192)' },
+        'mic_ads1115_V': { label: 'Mic Sensor (ADS1115)', canvasId: 'micSensorAdsChart', containerId: 'micSensorAdsChartContainer', borderColor: 'rgb(255, 99, 132)' },
+        'light_esp32_adc': { label: 'Light Sensor (ESP32 ADC)', canvasId: 'lightSensorEsp32Chart', containerId: 'lightSensorEsp32ChartContainer', borderColor: 'rgb(54, 162, 235)' },
+        'mic_esp32_adc': { label: 'Mic Sensor (ESP32 ADC)', canvasId: 'micSensorEsp32Chart', containerId: 'micSensorEsp32ChartContainer', borderColor: 'rgb(153, 102, 255)' }
+    };
+
+    // Función de ayuda para inicializar un gráfico
+    function initializeChart(chartInfo) {
+        const ctx = document.getElementById(chartInfo.canvasId)?.getContext('2d');
+        if (!ctx) return null;
+
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: chartInfo.label,
+                    data: [],
+                    borderColor: chartInfo.borderColor,
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                animation: false
+            }
+        });
+        return chart;
+    }
+
+    // Inicializar gráficos y selector al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+        const selector = document.getElementById('sensorChartSelector');
+        let firstChartKey = null;
+
+        for (const key in chartMapping) {
+            const chartInfo = chartMapping[key];
+            const chartObj = initializeChart(chartInfo);
+            
+            if (chartObj) {
+                sensorCharts[key] = chartObj;
+                sensorHistory[key] = []; // Inicializar historial
+                
+                // Añadir opción al selector
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = chartInfo.label;
+                selector.appendChild(option);
+
+                if (!firstChartKey) {
+                    firstChartKey = key; // Guardar la primera clave para mostrarla por defecto
+                }
+            }
+        }
+        
+        // Mostrar el primer gráfico por defecto si hay alguno
+        if (firstChartKey) {
+            selector.value = firstChartKey;
+            showSelectedChart();
+        }
+    });
+
+    // Función para mostrar solo el gráfico seleccionado
+    function showSelectedChart() {
+        const selector = document.getElementById('sensorChartSelector');
+        const selectedChartKey = selector.value;
+
+        // Ocultar todos los contenedores de gráficos
+        for (const key in chartMapping) {
+            const container = document.getElementById(chartMapping[key].containerId);
+            if (container) {
+                container.style.display = 'none';
+            }
+        }
+
+        // Mostrar solo el contenedor del gráfico seleccionado
+        const selectedContainer = document.getElementById(chartMapping[selectedChartKey]?.containerId);
+        if (selectedContainer) {
+            selectedContainer.style.display = 'block';
+            // Asegurarse de que el gráfico se redibuje correctamente si estaba oculto
+            sensorCharts[selectedChartKey]?.resize(); 
+        }
+    }
+
+    function updateLEDUI() {
+      document.getElementById("redBtn").querySelector('.mdc-button__label').innerText = `Red: ${state.ledRed === 1 ? 'ON' : 'OFF'}`;
+      if (state.ledRed === 1) {
+          document.getElementById("redBtn").classList.add('on');
+      } else {
+          document.getElementById("redBtn").classList.remove('on');
+      }
+
+      document.getElementById("greenBtn").querySelector('.mdc-button__label').innerText = `Green: ${state.ledGreen === 1 ? 'ON' : 'OFF'}`;
+      if (state.ledGreen === 1) {
+          document.getElementById("greenBtn").classList.add('on');
+      } else {
+          document.getElementById("greenBtn").classList.remove('on');
+      }
+    }
+
+    // Adaptado para manejar el nuevo formato de datos del servidor
+    function updateSensorDisplay(data) {
+      const container = document.getElementById("sensorData");
+      const placeholder = container.querySelector(".placeholder-message");
+      if (placeholder) {
+        placeholder.remove();
+      }
+
+      const deviceName = data.device;
+      const timestamp = new Date().toLocaleTimeString();
+
+      data.sensors.forEach(sensor => {
+        const sensorType = sensor.type;
+        const sensorValue = sensor.value;
+
+        const sensorKey = `${deviceName}-${sensorType}`;
+        let sensorElement = document.getElementById(sensorKey);
+
+        if (!sensorElement) {
+          sensorElement = document.createElement("div");
+          sensorElement.id = sensorKey;
+          sensorElement.className = "sensor-item";
+          container.prepend(sensorElement);
+        }
+
+        // Obtener el nombre legible del sensor del mapeo
+        const readableSensorName = chartMapping[sensorType]?.label || sensorType.replace(/_/g, ' ').toUpperCase();
+
+        sensorElement.innerHTML = `
+          <strong>${deviceName}</strong><br>
+          <em>${readableSensorName}</em>: ${sensorValue !== null ? sensorValue.toFixed(2) : 'N/A'}<br>
+          <small>${timestamp}</small>
+        `;
+
+        // Actualizar Chart.js si existe un gráfico para este tipo de sensor
+        if (sensorCharts[sensorType] && sensorHistory[sensorType] && sensorValue !== null) {
+            const chart = sensorCharts[sensorType];
+            const history = sensorHistory[sensorType];
+
+            if (history.length >= MAX_HISTORY_LENGTH) {
+                history.shift();
+                chart.data.labels.shift();
+            }
+            history.push(sensorValue);
+            chart.data.labels.push(timestamp);
+            chart.data.datasets[0].data = history;
+            chart.update();
+        }
+      });
+    }
+
+    function displayServerMessage(message) {
+        const messageContainer = document.getElementById("serverMessages");
+        const placeholder = messageContainer.querySelector(".placeholder-message");
+        if (placeholder) {
+            placeholder.remove();
+        }
+
+        const p = document.createElement("p");
+        p.className = `server-message ${message.type}`;
+        p.innerHTML = `⚠️ ${message.text} <small>(${new Date().toLocaleTimeString()})</small>`;
+        messageContainer.prepend(p);
+    }
+
+    // Listeners de Socket.IO
+    socket.on("led_update", function(data) {
+      state = data;
+      updateLEDUI();
+    });
+
+    socket.on("sensor_update", function(data) {
+      updateSensorDisplay(data);
+    });
+
+    socket.on("server_message", function(message) {
+        displayServerMessage(message);
+    });
+
+    // Función para enviar comandos de LED al servidor
+    function toggle(led) {
+      state[led] = state[led] ? 0 : 1;
+      socket.emit("control_led", state);
+    }
+  </script>
+</body>
+</html>

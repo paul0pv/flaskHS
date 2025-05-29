@@ -1,0 +1,500 @@
+/* static/styles.css */
+
+:root {
+  /* Paleta de Colores Fríos y Suaves */
+  --mdc-theme-primary: #455A64;
+  /* Azul Grisáceo Oscuro */
+  --mdc-theme-secondary: #26A69A;
+  /* Verde Azulado */
+  --mdc-theme-error: #EF9A9A;
+  /* Rojo Suave para Errores */
+
+  /* Colores de Texto sobre Fondos */
+  --mdc-theme-on-primary: #CFD8DC;
+  /* Gris Claro para texto sobre Primary */
+  --mdc-theme-on-surface: #263238;
+  /* Azul Grisáceo muy oscuro para texto general */
+
+  /* Colores de Superficie y Fondo */
+  --mdc-theme-background: #FAFAFA;
+  /* Fondo de la página (casi blanco) */
+  --mdc-theme-surface: #F5F5F5;
+  /* Superficies de tarjetas (gris muy claro) */
+
+  /* Colores de Botones de Control (ej. LEDs) */
+  --button-red-off: #EF9A9A;
+  /* Rojo suave */
+  --button-red-on: #D32F2F;
+  /* Rojo más fuerte */
+  --button-green-off: #A5D6A7;
+  /* Verde suave */
+  --button-green-on: #388E3C;
+  /* Verde más fuerte */
+  --button-text-light: #FAFAFA;
+  /* Texto claro para botones oscuros */
+  --button-text-dark: #263238;
+  /* Texto oscuro para botones claros */
+
+
+  --spacing-unit: 8px;
+  /* Unidad base para espaciado y tamaños */
+
+  --font-family: 'Roboto', sans-serif;
+  /* Se asume la carga de Roboto desde Google Fonts o similar */
+  --font-size-body: 1rem;
+  /* 16px */
+  --font-size-h1: 2rem;
+  /* 32px */
+  --font-size-h2: 1.25rem;
+  /* 20px */
+
+  /* Sombras */
+  --shadow-small: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-medium: 0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+/* --- Reseteo Básico y Contenedor Principal --- */
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+  background-color: var(--mdc-theme-primary);
+  color: var(--mdc-theme-on-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  height: 85vh;
+  max-width: 85%;
+  /* Reducir un poco el ancho máximo para un look más compacto */
+  margin: 0 auto;
+  padding: var(--spacing-unit) * 3;
+  /* 24px de padding alrededor */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* Ocupar al menos toda la altura de la vista */
+  box-sizing: border-box;
+  /* Incluir padding en el tamaño total */
+}
+
+/* --- App Bar (Header) --- */
+.app-bar {
+  background-color: var(--mdc-theme-background);
+  color: var(--mdc-theme-surface);
+  padding: var(--spacing-unit) * 2;
+  /* 16px */
+  text-align: center;
+  box-shadow: var(--shadow-medium);
+  /* Sombra para profundidad */
+  margin-bottom: var(--spacing-unit) * 8;
+  /* Más espacio debajo */
+  border-radius: 4px 4px 0px 0px;
+  /* Ligeros bordes redondeados */
+}
+
+.app-bar h1 {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: 500;
+  letter-spacing: -0.015625em;
+}
+
+/* --- Main Content Layout (Flexbox para responsividad) --- */
+.main-content {
+  background-color: var(--mdc-theme-surface);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit) * 4;
+}
+
+/* --- Cards (Secciones) --- */
+.card {
+  background-color: var(--mdc-theme-surface);
+  padding: var(--spacing-unit) * 3;
+  /* 24px */
+  border-radius: 4px;
+  /* box-shadow: var(--shadow-small) */
+  /* Sombra sutil para las tarjetas */
+  display: flex;
+  flex-direction: column;
+}
+
+.card h2 {
+  font-size: var(--font-size-h2);
+  margin-top: 0;
+  margin-bottom: var(--spacing-unit) * 2;
+  /* 16px */
+  color: var(--mdc-theme-on-surface);
+  /* Títulos en el color de texto principal */
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  /* Separador sutil */
+  padding-bottom: var(--spacing-unit);
+}
+
+/* --- Botones de Control --- */
+.buttons {
+  display: flex;
+  /*gap: var(--spacing-unit) * 2;*/
+  gap: var(--spacing-unit);
+  /* Espacio entre botones */
+  flex-wrap: wrap;
+  /* Envolver en pantallas pequeñas */
+  justify-content: space-evenly;
+  /* Centrar botones */
+  margin-top: var(--spacing-unit);
+}
+
+.mdc-button {
+  /* Reseteo de estilos de botón */
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  /* Permitir outline para accesibilidad */
+
+  /* Estilos Material Design */
+  min-width: 90px;
+  /* Ancho mínimo para legibilidad */
+  height: 40px;
+  /* Altura de botón */
+  padding: 0 20px;
+  /* Espaciado interno */
+  border-radius: 20px;
+  /* Más redondeado, estilo "pill" */
+  text-transform: uppercase;
+  font-weight: 600;
+  /* Un poco más de peso */
+  font-size: 0.9rem;
+  line-height: 1;
+  /* Ajustar línea para centrado vertical */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+  box-shadow: var(--shadow-small);
+  /* Sombra por defecto */
+}
+
+/* Colores específicos de los botones de LED */
+#redBtn {
+  background-color: var(--button-red-off);
+  color: var(--button-text-dark);
+}
+
+#redBtn.on {
+  /* Clase 'on' añadida por JS cuando el LED está encendido */
+  background-color: var(--button-red-on);
+  color: var(--button-text-light);
+}
+
+#greenBtn {
+  background-color: var(--button-green-off);
+  color: var(--button-text-dark);
+}
+
+#greenBtn.on {
+  /* Clase 'on' añadida por JS cuando el LED está encendido */
+  background-color: var(--button-green-on);
+  color: var(--button-text-light);
+}
+
+/* Estados de hover y foco */
+.mdc-button:hover {
+  box-shadow: var(--shadow-medium);
+  /* Más elevación al hover */
+  transform: translateY(-1px);
+  /* Ligero efecto 3D */
+}
+
+.mdc-button:active {
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 1px 1px rgba(0, 0, 0, 0.1);
+  /* Sombra más pequeña al presionar */
+  transform: translateY(0);
+  /* Vuelve a su posición */
+}
+
+/* Estado de foco para accesibilidad */
+.mdc-button:focus-visible {
+  outline: 2px solid var(--mdc-theme-secondary);
+  /* Borde claro para accesibilidad */
+  outline-offset: 3px;
+}
+
+/* --- Sensor Data Display --- */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  /* Columnas responsivas */
+  gap: var(--spacing-unit) * 2;
+  /* 16px */
+  margin-top: var(--spacing-unit);
+  flex-wrap: wrap;
+  /* Asegurar que se envuelvan si hay muchos */
+}
+
+.sensor-item {
+  background-color: #E0F7FA;
+  /* Un azul muy claro para los items de sensor */
+  border-left: 5px solid var(--mdc-theme-secondary);
+  /* Indicador visual de la fuente de datos */
+  border-radius: 4px;
+  padding: var(--spacing-unit) * 2;
+  box-shadow: var(--shadow-small);
+  /* Sombra ligera */
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sensor-item strong {
+  color: var(--mdc-theme-primary);
+  /* Color de la fuente del dispositivo */
+  font-size: 1.1em;
+  margin-bottom: var(--spacing-unit);
+}
+
+.sensor-item em {
+  color: var(--mdc-theme-on-surface);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1em;
+}
+
+.sensor-item small {
+  color: #607D8B;
+  /* Gris azulado para la marca de tiempo */
+  font-size: 0.8em;
+  margin-top: var(--spacing-unit);
+}
+
+/* --- Contenedores de Gráficos --- */
+.chart-container {
+  background-color: var(--mdc-theme-surface);
+  padding: var(--spacing-unit) * 2;
+  /* 16px */
+  border-radius: 4px;
+  box-shadow: var(--shadow-small);
+  margin-top: var(--spacing-unit) * 2;
+  /* Espacio entre gráficos */
+  height: 420px;
+  /* Altura fija para los gráficos */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* Centrar el canvas si es más pequeño */
+}
+
+.chart-container h3 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-unit) * 2;
+  color: var(--mdc-theme-on-surface);
+  /* Títulos de gráfico en color de texto principal */
+  font-weight: 500;
+  text-align: center;
+  font-size: 1.15rem;
+}
+
+canvas {
+  max-width: 100%;
+  /* Asegurar que el canvas sea responsivo */
+  height: auto;
+  /* Mantener la relación de aspecto */
+}
+
+
+/* --- Mensajes del Servidor --- */
+.server-messages {
+  background-color: var(--mdc-theme-surface);
+  padding: var(--spacing-unit) * 2;
+  border-radius: 4px;
+  box-shadow: var(--shadow-small);
+  max-height: 250px;
+  width: 80%;
+  margin: auto;
+  /* Altura máxima con scroll */
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  /* Borde suave */
+  margin-top: var(--spacing-unit) * 2;
+}
+
+.server-messages p {
+  margin-bottom: var(--spacing-unit);
+  padding: var(--spacing-unit);
+  border-radius: 4px;
+  line-height: 1.4;
+  font-size: 0.9rem;
+  word-break: break-word;
+  /* Romper palabras largas para evitar desbordamiento */
+}
+
+.server-messages p:last-child {
+  margin-bottom: 0;
+  /* Eliminar margen del último mensaje */
+}
+
+.server-messages p.error {
+  background-color: var(--mdc-theme-error);
+  color: #600000;
+  /* Rojo oscuro para el texto de error */
+  border: 1px solid #C62828;
+  /* Borde rojo */
+}
+
+.server-messages p.info {
+  background-color: #E1F5FE;
+  /* Azul muy claro */
+  color: #01579B;
+  /* Azul oscuro */
+  border: 1px solid #29B6F6;
+  /* Borde azul */
+}
+
+.placeholder-message {
+  color: #90A4AE;
+  /* Gris azulado suave */
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-unit) * 2;
+}
+
+/* --- Footer --- */
+.app-footer {
+  background-color: var(--mdc-theme-surface);
+  text-align: center;
+  padding: var(--spacing-unit) * 2;
+  margin-top: var(--spacing-unit) * 4;
+  /* Más espacio arriba del footer */
+  color: #607D8B;
+  /* Gris azulado */
+  font-size: 1rem;
+  /*border-top: 1px solid rgba(0, 0, 0, 0.05);*/
+  /* Separador */
+  padding-top: var(--spacing-unit) * 2;
+}
+
+/* --- Responsividad (Media Queries) --- */
+
+/* Para pantallas medianas (tablets y laptops pequeñas) */
+@media (min-width: 768px) {
+  .main-content {
+    flex-direction: row;
+    /* Diseño en filas */
+    flex-wrap: wrap;
+    /* Permitir que las tarjetas se envuelvan */
+    align-items: flex-start;
+    /* Alinear arriba para un look más limpio */
+  }
+
+  .card {
+    flex: 1 1 calc(50% - var(--spacing-unit) * 1.5);
+    /* Dos columnas, con espacio entre ellas */
+    min-width: 300px;
+    /* Ancho mínimo para evitar que se aplasten demasiado */
+    box-sizing: border-box;
+  }
+
+  /* Ajustes específicos para el layout */
+  .card:nth-child(1) {
+    /* LED Control */
+    flex-basis: calc(30% - var(--spacing-unit) * 1.5);
+    /* Más pequeño */
+  }
+
+  .card:nth-child(2) {
+    /* Sensor Data (más grande) */
+    flex-basis: calc(70% - var(--spacing-unit) * 1.5);
+    /* Más grande */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card:nth-child(3) {
+    /* Server Messages */
+    flex-basis: 100%;
+    /* Ocupa todo el ancho en una nueva fila */
+    order: 3;
+    /* Asegurar que aparezca abajo */
+  }
+
+  .sensor-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 300px));
+    justify-content: space-evenly;
+  }
+}
+
+/* Para pantallas grandes (desktops) */
+@media (min-width: 1024px) {
+  .container {
+    padding: var(--spacing-unit) * 4;
+    /* Más padding en pantallas grandes */
+  }
+
+  .main-content {
+    gap: var(--spacing-unit) * 8;
+    /* Más espacio entre secciones */
+  }
+
+  .card:nth-child(1) {
+    /* LED Control */
+    flex-basis: calc(25% - var(--spacing-unit) * 2);
+    /* Aún más pequeño */
+  }
+
+  .card:nth-child(2) {
+    /* Sensor Data */
+    flex-basis: calc(50% - var(--spacing-unit) * 2);
+    /* Ocupa la mitad central */
+  }
+
+  .card:nth-child(3) {
+    /* Server Messages */
+    flex-basis: calc(25% - var(--spacing-unit) * 2);
+    /* Ocupa la última cuarta parte */
+    order: unset;
+    /* Volver al orden normal si lo hemos cambiado */
+  }
+
+  .sensor-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 320px));
+    align-items: center;
+    /* Más compacto */
+  }
+}
+
+/* Para pantallas muy pequeñas (móviles en orientación vertical) */
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-unit) * 2;
+    /* Menos padding en móviles */
+  }
+
+  .app-bar h1 {
+    font-size: 1.75rem;
+    /* Fuente más pequeña en móviles */
+  }
+
+  .mdc-button {
+    width: 100%;
+    /* Botones de ancho completo */
+    min-width: unset;
+  }
+
+  .sensor-grid {
+    grid-template-columns: 1fr;
+    /* Una columna en móviles */
+  }
+}

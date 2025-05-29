@@ -22,6 +22,7 @@ Welcome to the cutting edge (or at least, the slightly less dull edge) of local 
 
 ## 📁 Project Structure (Because organization is key)
 
+```
 .
 ├── run.py                 # Main Flask server application (HTTP/WebSocket)
 ├── run-mqtt.py            # Alternative Flask server with MQTT integration
@@ -38,7 +39,7 @@ Welcome to the cutting edge (or at least, the slightly less dull edge) of local 
 ├── requirements.txt       # List of Python dependencies (pip install -r this!)
 ├── README.md              # You are here!
 └── LICENSE                # The MIT License (because sharing is caring)
-
+```
 
 ## ⚙️ Installation & Setup (Let's get this party started!)
 

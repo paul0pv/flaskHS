@@ -107,6 +107,7 @@ http://`<YOUR-SERVER-IP>`:5000/
 Microcontrollers can send their data via a `POST` request to:
 
 POST /api/sensor
+
 Content-Type: application/json
 
 

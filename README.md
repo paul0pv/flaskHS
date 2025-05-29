@@ -98,7 +98,7 @@ Welcome to the cutting edge (or at least, the slightly less dull edge) of local 
 
 Open your favorite web browser and navigate to:
 
-http://<YOUR-SERVER-IP>:5000/
+http://`<YOUR-SERVER-IP>`:5000/
 
 (Replace `<YOUR-SERVER-IP>` with the actual IP address of the machine running your Flask server. Yes, the one you just set up.)
 

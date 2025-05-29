@@ -15,6 +15,7 @@ webenv/ # Your virtual environment folder
 .idea/ # PyCharm/IntelliJ specific files
 
 # Database
+automation.db
 *.db # SQLite database files, like automation.db
 *.sqlite
 *.sqlite3
